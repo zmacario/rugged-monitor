@@ -85,3 +85,14 @@ a new one) and writes the STL files, the STEP file and the images to `out/`.
 The bezel, chassis and cover have been printed and validated against the real
 hardware. The keys (TPU strip, pins and frame), the port caps and the silicone gasket
 have not been tested yet.
+
+## License
+
+- **The Fusion script** (`fusion/RuggedMonitor`) — [MIT](LICENSE)
+- **The design** (`out/*.step`, `out/*.stl`, renders) — [CC BY-SA 4.0](LICENSE-DESIGN.md)
+
+You may print and sell this enclosure; credit José Macário (@zmacario), link back here,
+and share modifications of the design under the same license. See
+[LICENSE-DESIGN.md](LICENSE-DESIGN.md).
+
+Not affiliated with 52Pi.
