@@ -1,0 +1,10 @@
+{
+	"autodeskProduct":	"Fusion360",
+	"type":	"script",
+	"author":	"",
+	"description":	{
+		"":	"Caixa robusta (IP54, VESA 75) para o ecra 52Pi EP-0084 de 7 polegadas"
+	},
+	"supportedOS":	"windows|mac",
+	"editEnabled":	true
+}
