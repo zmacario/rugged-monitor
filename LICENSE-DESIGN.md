@@ -25,12 +25,13 @@ Under these terms:
 
 ## Why two licenses
 
-The Fusion script `fusion/RuggedMonitor/RuggedMonitor.py` is software, and
-software licenses fit it better, so it is under the **MIT License** (see
-`LICENSE`). Everything it produces — the enclosure itself — is a hardware design
-and is under **CC BY-SA 4.0**.
+The Fusion scripts `fusion/RuggedMonitor/RuggedMonitor.py` and
+`fusion/RuggedMonitorStand/RuggedMonitorStand.py` are software, and software
+licenses fit them better, so they are under the **MIT License** (see `LICENSE`).
+Everything they produce — the enclosure and the stand — is a hardware design and
+is under **CC BY-SA 4.0**.
 
-If you only want to print the enclosure, only CC BY-SA 4.0 concerns you. If you
+If you only want to print the enclosure or the stand, only CC BY-SA 4.0 concerns you. If you
 want to reuse the script to generate an enclosure for another display, MIT
 concerns you, and the geometry you generate is yours.
 

@@ -1,0 +1,10 @@
+{
+	"autodeskProduct":	"Fusion360",
+	"type":	"script",
+	"author":	"",
+	"description":	{
+		"":	"Tilting desk stand for the rugged enclosure of the 52Pi EP-0084 display (VESA 75)"
+	},
+	"supportedOS":	"windows|mac",
+	"editEnabled":	true
+}

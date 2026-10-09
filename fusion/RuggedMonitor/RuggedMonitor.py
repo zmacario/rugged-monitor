@@ -547,7 +547,7 @@ def build():
     tbm.booleanOperation(ports, region, adsk.fusion.BooleanTypes.IntersectionBooleanType)
     extras = {'LCD pocket test': test, 'Hardware test': coupon, 'Port wall test': ports}
 
-    info = dict(T=T, z_split=z_split, z_in=z_in, z_pcb=z_pcb, cy=cy,
+    info = dict(T=T, z_split=z_split, z_in=z_in, z_pcb=z_pcb, cx=cx, cy=cy,
                 width=(ax1 - ax0) + 2 * d_out, height=(ay1 - ay0) + 2 * d_lug + p['lug_d'],
                 bezel=dict(x_neg=wx0 - (ax0 - d_out), x_pos=(ax1 + d_out) - wx1,
                            bottom=wy0 - (ay0 - d_out), top=(ay1 + d_out) - wy1),
