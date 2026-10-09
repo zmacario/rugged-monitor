@@ -3,7 +3,7 @@
 	"type":	"script",
 	"author":	"",
 	"description":	{
-		"":	"Caixa robusta (IP54, VESA 75) para o ecra 52Pi EP-0084 de 7 polegadas"
+		"":	"Rugged enclosure (splash and dust resistant, VESA 75) for the 52Pi EP-0084 7-inch display"
 	},
 	"supportedOS":	"windows|mac",
 	"editEnabled":	true

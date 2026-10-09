@@ -1,84 +1,87 @@
 # Rugged Monitor EP-0084
 
-Caixa robusta, impressa em 3D, para o ecrã de 7" com toque capacitivo
-[52Pi EP-0084](https://wiki.52pi.com/index.php/EP-0084) (1024×600, HDMI, toque por USB).
+A rugged, 3D-printed enclosure for the
+[52Pi EP-0084](https://wiki.52pi.com/index.php/EP-0084) 7" capacitive touch display
+(1024×600, HDMI, touch over USB).
 
-![Frente com a pala de sol](out/11-pala-de-sol.png)
-![Traseira](out/2-tras.png)
+![Front with the sun hood](out/11-sun-hood.png)
+![Rear](out/2-rear.png)
 
-- Dimensões exteriores: 192,9 × 148,9 × 40,5 mm
-- Suporte VESA 75
-- Proteção contra choques, pó e salpicos (junta entre moldura e tampa, tampões nas portas)
-- HDMI e alimentação na aresta de cima, micro-USB do toque na lateral
-- Botões do menu acessíveis por fora, através de teclas em TPU
-- Pala de sol destacável, para uso no painel do automóvel
+- Outer dimensions: 192.9 × 148.9 × 40.5 mm
+- VESA 75 mount
+- Protection against shock, dust and splashes (gasket between bezel and cover, caps on the ports)
+- HDMI and power on the top edge, touch micro-USB on the side
+- Menu buttons reachable from outside, through TPU keys
+- Detachable sun hood, for use on a car dashboard
 
-## Peças
+## Parts
 
-Os ficheiros em `out/` abrem já na posição de impressão e não precisam de suportes.
+The files in `out/` open in print orientation and need no supports.
 
-| Ficheiro | Material | Volume |
+| File | Material | Volume |
 |---|---|---|
-| `moldura-frontal.stl` | Rígido | 90 cm³ |
-| `chassis.stl` | Rígido | 46 cm³ |
-| `tampa-traseira.stl` | Rígido | 184 cm³ |
-| `aro-teclas.stl` | Rígido | 7 cm³ |
-| `pala-de-sol.stl` | Rígido | 42 cm³ |
-| `teclas-tpu.stl` | TPU 95A | 2 cm³ |
-| `tampao-hdmi-dc-tpu.stl` | TPU 95A | 4 cm³ |
-| `tampao-usb-tpu.stl` | TPU 95A | 1 cm³ |
+| `front-bezel.stl` | Rigid | 90 cm³ |
+| `chassis.stl` | Rigid | 46 cm³ |
+| `rear-cover.stl` | Rigid | 184 cm³ |
+| `keypad-frame.stl` | Rigid | 7 cm³ |
+| `sun-hood.stl` | Rigid | 42 cm³ |
+| `keypad-strip-tpu.stl` | TPU 95A | 2 cm³ |
+| `port-cap-hdmi-dc-tpu.stl` | TPU 95A | 4 cm³ |
+| `port-cap-usb-tpu.stl` | TPU 95A | 1 cm³ |
 
-Material rígido: ASA para uso no automóvel (o PETG amolece perto dos 80 °C e o PLA
-não serve); PETG chega para uso em interior.
+Rigid material: ASA for use in a car (PETG softens near 80 °C and PLA is not
+suitable); PETG is enough for indoor use.
 
-Provas de encaixe, para validar folgas antes das peças grandes:
-`prova-alojamento.stl` (alojamento do LCD), `prova-ferragens.stl` (rasgos de porca e
-furos) e `prova-portas.stl` (paredes das portas da tampa).
+Fit tests, to validate clearances before printing the large parts:
+`test-lcd-pocket.stl` (LCD pocket), `test-hardware.stl` (nut slots and holes) and
+`test-port-walls.stl` (the port walls of the cover).
 
-`rugged-monitor.step` tem o conjunto completo, incluindo os componentes do kit como
-referência.
+`rugged-monitor.step` holds the full assembly, including the kit components as
+reference.
 
-## Ferragens
+## Hardware
 
-| Qtd. | Peça | Onde |
+| Qty | Part | Where |
 |---|---|---|
-| 6 | Parafuso M3×20, cabeça cilíndrica (DIN 912) | Fecho da tampa contra a moldura |
-| 5 | Parafuso M3×16, cabeça abaulada (ISO 7380) | Pinos das teclas |
-| 31 | Parafuso M3×10, cabeça abaulada (ISO 7380) | Chassis (9), placas (6), aro das teclas (6), pala (6), teclado OSD (2), hastes dos tampões (2) |
-| 29 | Porca sextavada M3 normal (DIN 934) | Fecho (6), chassis (9), placas (6), pala (8) |
-| 10 | Inserto roscado M3, a quente | Aro das teclas (6), teclado OSD (2), hastes dos tampões (2) |
-| 4 | Inserto roscado M4, a quente | Suporte VESA |
-| 4 | Parafuso M4×8 | Suporte VESA |
-| — | Cola de silicone neutro | Junta entre moldura e tampa |
-| — | Fita de espuma adesiva de 1 mm | Entre a aba frontal e o vidro; entre o LCD e o chassis |
+| 6 | M3×20 screw, socket cap head (DIN 912) | Closing the cover against the bezel |
+| 5 | M3×16 screw, button head (ISO 7380) | Key pins |
+| 31 | M3×10 screw, button head (ISO 7380) | Chassis (9), boards (6), keypad frame (6), sun hood (6), OSD keypad (2), port cap tethers (2) |
+| 29 | M3 hex nut, standard (DIN 934) | Closure (6), chassis (9), boards (6), sun hood (8) |
+| 10 | M3 heat-set threaded insert | Keypad frame (6), OSD keypad (2), port cap tethers (2) |
+| 4 | M4 heat-set threaded insert | VESA mount |
+| 4 | M4×8 screw | VESA mount |
+| — | Neutral-cure silicone sealant | Gasket between bezel and cover |
+| — | 1 mm adhesive foam tape | Between the front lip and the glass; between the LCD and the chassis |
 
-Nenhum parafuso rosca diretamente no plástico: usam-se porcas presas em rasgos onde
-há acesso, e insertos de latão nos furos cegos que não podem atravessar a parede.
+No screw threads directly into plastic: nuts are held captive in slots where there
+is access, and brass inserts are used in the blind holes that must not go through
+the wall.
 
-## Montagem, em resumo
+## Assembly, in short
 
-1. Meter as 9 porcas do chassis nos rasgos da parede do alojamento do LCD.
-2. Colar a espuma na aba e pousar o conjunto LCD + vidro, com os flats do lado dos batentes.
-3. Encaixar as 6 porcas por baixo do chassis, passar os flats pelos rasgos e aparafusar o chassis.
-4. Montar a placa de vídeo e a do toque no chassis e ligar os flats.
-5. Na tampa: aplicar os insertos, meter os pinos das teclas, montar o teclado OSD, a tira de teclas e o aro.
-6. Fechar a tampa com os 6 parafusos M3×20.
+1. Slide the 9 chassis nuts into the slots in the wall of the LCD pocket.
+2. Stick the foam on the lip and lay the LCD + glass assembly in, with the flex cables on the side of the stops.
+3. Fit the 6 nuts under the chassis, pass the flex cables through its slots and screw the chassis down.
+4. Mount the video board and the touch board on the chassis and connect the flex cables.
+5. On the cover: set the inserts, drop in the key pins, mount the OSD keypad, the keypad strip and the frame.
+6. Close the cover with the 6 M3×20 screws.
 
-A junta é moldada no local: silicone na valeta da moldura, desmoldante no ressalto
-da tampa, curar com a caixa fechada e vazia.
+The gasket is formed in place: silicone in the bezel groove, release agent on the
+cover tongue, cured with the case closed and empty.
 
-## Regenerar o modelo
+## Regenerating the model
 
-O modelo é gerado pelo script `fusion/RuggedMonitor/RuggedMonitor.py`, para o Autodesk
-Fusion. Todas as cotas estão no dicionário `P`, no topo do ficheiro.
+The model is generated by the `fusion/RuggedMonitor/RuggedMonitor.py` script, for
+Autodesk Fusion. Every dimension lives in the `P` dictionary at the top of the file.
 
-1. Copiar (ou ligar) a pasta `fusion/RuggedMonitor` para a pasta de scripts do Fusion.
-2. No Fusion: Utilities → Scripts and Add-Ins → RuggedMonitor → Run.
+1. Copy (or link) the `fusion/RuggedMonitor` folder into Fusion's scripts folder.
+2. In Fusion: Utilities → Scripts and Add-Ins → RuggedMonitor → Run.
 
-O script reconstrói o documento "Rugged Monitor" se estiver aberto (senão cria um novo)
-e grava os STL, o STEP e as imagens em `out/`.
+The script rebuilds the "Rugged Monitor" document if it is open (otherwise it creates
+a new one) and writes the STL files, the STEP file and the images to `out/`.
 
-## Estado
+## Status
 
-Moldura, chassis e tampa foram impressos e validados com o hardware real. As teclas
-(tira de TPU, pinos e aro), os tampões e a junta de silicone ainda não foram testados.
+The bezel, chassis and cover have been printed and validated against the real
+hardware. The keys (TPU strip, pins and frame), the port caps and the silicone gasket
+have not been tested yet.

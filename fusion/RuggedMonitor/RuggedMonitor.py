@@ -1,15 +1,15 @@
-# Caixa robusta para o ecra 52Pi EP-0084 (7" 1024x600, toque capacitivo).
+# Rugged enclosure for the 52Pi EP-0084 display (7" 1024x600, capacitive touch).
 #
-# Script do Fusion: Utilities > Scripts and Add-Ins > RuggedMonitor > Run.
-# Reconstroi o documento "Rugged Monitor" se estiver ativo (senao cria um novo)
-# com as pecas a imprimir (moldura, chassis, tampa,
-# tampoes em TPU) e os componentes do kit como referencia.
+# Fusion script: Utilities > Scripts and Add-Ins > RuggedMonitor > Run.
+# Rebuilds the "Rugged Monitor" document if it is active (otherwise creates a new
+# one) with the printed parts (bezel, chassis, cover, keypad parts, TPU caps,
+# sun hood) and the kit components as reference.
 #
-# Todas as cotas estao em mm no dicionario P. Para ajustar o desenho, mudar
-# os valores e voltar a correr o script.
+# All dimensions are in mm in the P dictionary. To adjust the design, change the
+# values and run the script again.
 #
-# Eixos (vista de TRAS do monitor): X para a direita, Y para cima,
-# Z = 0 na face frontal da moldura, a crescer para a traseira.
+# Axes (REAR view of the monitor): X to the right, Y up,
+# Z = 0 at the front face of the bezel, increasing towards the back.
 
 import math
 import os
@@ -19,104 +19,104 @@ import adsk.core
 import adsk.fusion
 
 P = dict(
-    # --- LCD (desenho TP_Dimension do wiki) ---
-    lcd_w=164.86, lcd_h=99.96,  # confirmado com a prova de encaixe impressa
-    stack_t=4.55,           # medido: LCD + vidro de toque colados
-    lcd_fpc_left=68.23,     # da aresta esquerda (vista de frente) ao flat
+    # --- LCD (TP_Dimension drawing on the wiki) ---
+    lcd_w=164.86, lcd_h=99.96,  # confirmed with the printed fit test
+    stack_t=4.55,           # measured: LCD + touch glass, bonded
+    lcd_fpc_left=68.23,     # from the left edge (front view) to the flex cable
     lcd_fpc_w=25.5,
-    # --- vidro de toque (Tp-mechanical) ---
+    # --- touch glass (Tp-mechanical) ---
     tp_w=164.4, tp_h=99.3,
-    va_w=155.0, va_h=89.0,  # area visivel
-    va_left=2.9, va_top=2.9,  # confirmado: margens vistas de frente (direita 6.5, baixo 7.4)
-    tp_tail_right=13.3,     # da aresta direita (vista de frente) ao flat
+    va_w=155.0, va_h=89.0,  # visible area
+    va_left=2.9, va_top=2.9,  # confirmed: margins seen from the front (right 6.5, bottom 7.4)
+    tp_tail_right=13.3,     # from the right edge (front view) to the flex cable
     tp_tail_w=15.5,
-    # --- placa de video (Outlinedrawing) ---
+    # --- video board (Outlinedrawing) ---
     vb_w=90.6, vb_h=65.6,
-    vb_con1_x=34.75,        # centro do conector do flat, a partir da esquerda
-    lcd_fpc_len=42.9,       # medido: flat do LCD dobrado e esticado por tras do LCD
-    vb_holes=((2.4, 2.3), (2.4, 62.1), (79.6, 1.6), (88.75, 61.9)),   # confirmado no chassis impresso
+    vb_con1_x=34.75,        # flex connector centre, from the left
+    lcd_fpc_len=42.9,       # measured: LCD flex folded and pulled flat behind the LCD
+    vb_holes=((2.4, 2.3), (2.4, 62.1), (79.6, 1.6), (88.75, 61.9)),   # confirmed on the printed chassis
     vb_hdmi_x=60.6, vb_dc_x=82.1, vb_vga_x=33.3, vb_rca_x=10.5,
-    hdmi_zc=3.1,            # centro do HDMI acima da face da placa
-    dc_zc=6.5,              # confirmado: centro da ficha DC acima da face da placa
-    # --- placa do toque CTP-5710 ---
+    hdmi_zc=3.1,            # HDMI centre above the board face
+    dc_zc=6.5,              # confirmed: DC jack centre above the board face
+    # --- CTP-5710 touch board ---
     ctp_l=56.9, ctp_w=28.07,
-    tp_tail_len=34.5,       # medido: flat do toque dobrado e esticado por tras do LCD
+    tp_tail_len=34.5,       # measured: touch flex folded and pulled flat behind the LCD
     ctp_hole=3.56,
-    ctp_usb=13.46,          # centro do micro-USB a partir da ponta oposta ao flat
+    ctp_usb=13.46,          # micro-USB centre from the end opposite the flex
     usb_zc=1.4,
-    # --- flats: as placas ficam onde o flat chega com folga ---
-    fpc_contact=5.0,        # ponta do flat que entra no conector
-    fpc_slack=5.5,          # folga para o flat nao ficar esticado
-    fpc_conn_h=1.0,         # entrada do conector acima da face da placa
-    fpc_slot=12.0,          # altura dos rasgos do chassis acima da aresta inferior do LCD
-    # --- teclado OSD ---
+    # --- flex cables: each board sits where its flex reaches with slack ---
+    fpc_contact=5.0,        # flex tip that goes into the connector
+    fpc_slack=5.5,          # slack so the flex is not pulled tight
+    fpc_conn_h=1.0,         # connector mouth above the board face
+    fpc_slot=12.0,          # height of the chassis slots above the LCD bottom edge
+    # --- OSD keypad ---
     kp_l=76.0, kp_w=16.0,
-    kp_x=73.0,              # centro do teclado em X (vista de tras)
-    kp_btn=(5.90, 23.75, 36.325, 52.025, 69.90),  # a partir da ponta do LED
+    kp_x=73.0,              # keypad centre in X (rear view)
+    kp_btn=(5.90, 23.75, 36.325, 52.025, 69.90),  # from the LED end
     kp_holes=(15.15, 60.68),
-    kp_row=4.0,             # medido: fila de botoes a partir da aresta da placa
-    kp_sw_h=4.6,            # medido: altura dos botoes acima da placa
-    # --- empilhamento em Z ---
-    lip_t=2.5,              # aba frontal que protege o vidro
-    seal_t=0.8,             # espuma de vedacao entre aba e vidro (1 mm comprimida)
-    pad_t=1.0,              # espuma entre LCD e chassis
+    kp_row=4.0,             # measured: button row from the board edge
+    kp_sw_h=4.6,            # measured: button height above the board
+    # --- Z stack-up ---
+    lip_t=2.5,              # front lip that protects the glass
+    seal_t=0.8,             # sealing foam between lip and glass (1 mm, compressed)
+    pad_t=1.0,              # foam between LCD and chassis
     mid_t=2.0,              # chassis
-    so_h=8.0,               # espacadores das placas (8 mm para parafuso M3x10)
+    so_h=8.0,               # board standoffs (8 mm to suit an M3x10 screw)
     pcb_t=1.6,
-    comp_h=13.0,            # componente mais alto (VGA) acima da placa
+    comp_h=13.0,            # tallest component (VGA) above the board
     clr=3.0,
     back_t=4.0,
-    # --- caixa ---
-    fit=0.3,                # folga do LCD no alojamento
-    test_wall=3.0, test_depth=4.0,   # prova de encaixe do alojamento
-    center_window=True,     # alargar a caixa para a janela ficar ao centro da frente
-    fpc_gap=2.5,            # espaco para os flats dobrarem por baixo do LCD
-    ledge=7.0,              # apoio do chassis a volta do alojamento
+    # --- enclosure ---
+    fit=0.3,                # LCD clearance in its pocket
+    test_wall=3.0, test_depth=4.0,   # LCD pocket fit test
+    center_window=True,     # widen the case so the window is centred on the front
+    fpc_gap=2.5,            # room for the flex cables to fold under the LCD
+    ledge=7.0,              # chassis ledge around the pocket
     mid_clr=0.25,
     wall_gap=0.5,
     wall=4.4,
     r_out=10.0,
-    groove_w=2.4, groove_d=1.5,   # valeta da moldura
-    # ressalto da tampa que entra na valeta; a folga a volta dele (0,5 mm de cada
-    # lado e no fundo) e para a junta de cola de silicone
+    groove_w=2.4, groove_d=1.5,   # gasket groove in the bezel
+    # tongue on the cover that enters the groove; the gap around it (0.5 mm on each
+    # side and at the bottom) is for the silicone sealant gasket
     tongue_w=1.4, tongue_h=1.0,
     lug_d=10.0, lug_out=2.5, lug_x=75.0,
-    lug_fillet=6.0,         # raio da concordancia entre cada coluna e a parede
-    # nenhum parafuso rosca no plastico: porcas M3 presas em rasgos ou alojamentos
-    # onde ha acesso, insertos de latao nos furos cegos que nao podem atravessar
-    nut_af=5.7, nut_h=2.6,        # rasgo para porca M3 (5,5 entre faces, 2,4 de altura); confirmado na prova
-    nut_roof=2.25,                # plastico entre a porca e a face de apoio do chassis
-    lug_nut_z=2.0,                # altura do rasgo da porca nas colunas, a partir da frente
-    ins_d=4.0,                    # furo para inserto roscado M3
-    # comprimentos escolhidos para os parafusos que ja existem em stock:
-    # M3x20 cilindrica no fecho, M3x16 abaulada nos pinos, M3x10 abaulada no resto
+    lug_fillet=6.0,         # fillet radius between each screw column and the wall
+    # no screw threads into plastic: M3 nuts captive in slots or pockets where there
+    # is access, brass inserts in the blind holes that must not go through
+    nut_af=5.7, nut_h=2.6,        # slot for an M3 nut (5.5 across flats, 2.4 thick); confirmed on the test print
+    nut_roof=2.25,                # plastic between the nut and the chassis seat
+    lug_nut_z=2.0,                # height of the nut slot in the columns, from the front
+    ins_d=4.0,                    # hole for an M3 threaded insert
+    # lengths chosen to suit the screws already in stock: M3x20 cap head for the
+    # closure, M3x16 button head for the pins, M3x10 button head everywhere else
     m3_clear=3.4, m3_head=6.5, m3_grip=11.0,
-    chassis_collar=2.0,           # ressalto sob a cabeca dos parafusos do chassis
+    chassis_collar=2.0,           # collar under the chassis screw heads
     vesa=75.0, vesa_ins_d=5.6, vesa_ins_depth=6.0, vesa_boss_d=11.0,
-    # teclas: um parafuso M3 de cabeca abaulada por botao serve de pino; a cabeca
-    # flutua por fora da tampa, debaixo de uma tira de TPU presa por um aro
+    # keys: one M3 button-head screw per button acts as a pin; its head floats
+    # outside the cover, under a TPU strip held down by a frame
     pin_len=16.0, pin_d=3.0, pin_head_d=5.7, pin_head_h=1.65,
     pin_hole_d=3.4,
-    key_float=0.6,          # folga da cabeca do pino acima da tampa (curso + margem)
-    key_cav_d=11.0,         # camara do TPU a volta da cabeca do pino
-    key_roof=0.6,           # membrana que o dedo empurra
+    key_float=0.6,          # gap of the pin head above the cover (travel + margin)
+    key_cav_d=11.0,         # TPU chamber around the pin head
+    key_roof=0.6,           # membrane the finger presses
     key_flange=0.6, key_bead_w=0.8, key_bead_h=0.5,
-    key_nub_d=4.0, key_nub_h=0.5,   # marca em relevo no eixo de cada botao
+    key_nub_d=4.0, key_nub_h=0.5,   # raised marker on each button axis
     frame_t=4.0, frame_pocket=1.0, frame_half_w=16.5, frame_screw_dx=12.5,
     frame_boss_h=6.0,
     hdmi_open=(24.0, 14.0), dc_open=13.0, usb_open=(12.5, 9.0),
     cap_t=2.0, cap_plug=4.0,
-    tether_len=10.0, tether_w=8.0, tether_t=1.0, eye_d=9.0,   # haste e olhal dos tampoes
+    tether_len=10.0, tether_w=8.0, tether_t=1.0, eye_d=9.0,   # port cap tether and eyelet
     tether_rib=6.0, tether_hole=9.0,
-    tether_top_len=30.0, tether_top_w=6.0, eye_top_d=8.0,     # haste em L do tampao de cima
+    tether_top_len=30.0, tether_top_w=6.0, eye_top_d=8.0,     # L-shaped tether of the top cap
     chamfer=1.2, win_chamfer=1.5,
-    # pala de sol destacavel, presa por parafusos M3x10 de aperto manual que roscam
-    # em porcas metidas em rasgos abertos nas arestas da moldura. O padrao e
-    # simetrico em relacao ao centro da janela: a pala serve nas duas orientacoes.
+    # detachable sun hood, held by M3x10 thumb screws that thread into nuts sitting
+    # in slots open on the bezel edges. The pattern is symmetric about the window
+    # centre, so the hood fits in both orientations.
     hood_side_dx=89.5, hood_side_dy=22.0, hood_top_dx=55.0, hood_top_dy=60.95,
     hood_nut_z=3.0, hood_hole_z=7.8,
-    hood_inset=1.9,         # recuo da aba em relacao ao contorno da moldura
-    hood_corner_r=6.0,      # raio interior dos cantos de cima da pala
+    hood_inset=1.9,         # flange inset from the bezel outline
+    hood_corner_r=6.0,      # inner radius of the hood top corners
     hood_margin=6.0, hood_depth=50.0, hood_depth_bottom=15.0, hood_wall=2.0, hood_flange_t=3.0,
 )
 
@@ -188,22 +188,22 @@ def build():
     p = P
     g = {}
 
-    # alojamento do LCD + vidro
+    # pocket for LCD + glass
     px1 = p['lcd_w'] / 2 + p['fit']
     px0 = -px1
     py1 = p['lcd_h'] / 2 + p['fit']
     py0 = -(p['lcd_h'] / 2 + p['fit'] + p['fpc_gap'])
     lcd_bot = -p['lcd_h'] / 2
 
-    # janela (X espelhado: o modelo esta em vista de tras)
+    # window (X mirrored: the model is in rear view)
     va_right = p['tp_w'] - p['va_w'] - p['va_left']
     wx0 = -p['tp_w'] / 2 + va_right
     wx1 = p['tp_w'] / 2 - p['va_left']
     wy1 = p['tp_h'] / 2 - p['va_top']
     wy0 = wy1 - p['va_h']
 
-    # contorno base da caixa: o alojamento, alargado do lado para onde a janela esta
-    # descentrada, de modo a que a janela fique ao centro da frente
+    # base outline of the case: the pocket, widened on the side the window is
+    # offset towards, so that the window ends up centred on the front
     ex = (wx0 + wx1) - (px0 + px1) if p['center_window'] else 0.0
     ey = (wy0 + wy1) - (py0 + py1) if p['center_window'] else 0.0
     ax0, ax1 = px0 + min(ex, 0.0), px1 + max(ex, 0.0)
@@ -211,7 +211,7 @@ def build():
     cx = (ax0 + ax1) / 2
     cy = (ay0 + ay1) / 2
 
-    # afastamentos a partir do contorno base
+    # offsets from the base outline
     d_mid = p['ledge']
     d_rec = d_mid + p['mid_clr']
     d_in = d_mid + p['wall_gap']
@@ -223,7 +223,7 @@ def build():
     def ring(d, z0, z1):
         return rrect(ax0 - d, ax1 + d, ay0 - d, ay1 + d, z0, z1, d - r_corner)
 
-    # cotas em Z
+    # Z levels
     stack = p['stack_t']
     z_glass = p['lip_t'] + p['seal_t']
     z_ledge = z_glass + stack + p['pad_t']
@@ -237,9 +237,9 @@ def build():
     lugs = [(x, yw + sgn * p['lug_out']) for x, yw, sgn in lug_defs]
 
     def lug_body(x, y_wall, sgn, z0, z1):
-        # coluna do parafuso fundida com a parede por duas concordancias concavas.
-        # Os arcos cruzam a parede e a coluna com um angulo minimo em vez de serem
-        # exatamente tangentes, para a operacao booleana ser robusta.
+        # screw column blended into the wall by two concave fillets. The arcs
+        # cross the wall and the column at a tiny angle instead of being exactly
+        # tangent, to keep the boolean operation robust.
         r, f, lo = p['lug_d'] / 2, p['lug_fillet'], p['lug_out']
         fy = f - 0.02
         dx = ((r + f) ** 2 - (fy - lo) ** 2) ** 0.5 * 0.9995
@@ -252,16 +252,16 @@ def build():
         add(b, web)
         return b
 
-    # flats
+    # flex cables
     fpc_x1 = p['lcd_w'] / 2 - p['lcd_fpc_left']
     fpc_x0 = fpc_x1 - p['lcd_fpc_w']
     tail_x0 = -p['tp_w'] / 2 + p['tp_tail_right']
     tail_x1 = tail_x0 + p['tp_tail_w']
 
-    # placa de video
+    # video board
     vb_x0 = (fpc_x0 + fpc_x1) / 2 - p['vb_con1_x']
-    # o flat sobe da traseira do LCD ate ao conector: a placa fica a distancia que
-    # o comprimento livre do flat (sem a ponta de contacto e sem a folga) alcanca
+    # the flex rises from the back of the LCD to the connector: the board sits as
+    # far as the free length of the flex (minus contact tip and slack) can reach
     fpc_rise = p['pad_t'] + p['mid_t'] + p['so_h'] + p['pcb_t'] + p['fpc_conn_h']
 
     def fpc_reach(length):
@@ -275,7 +275,7 @@ def build():
     hdmi_z = z_pcb + p['hdmi_zc']
     dc_z = z_pcb + p['dc_zc']
 
-    # placa do toque: flat para baixo, micro-USB virado para -X
+    # touch board: flex pointing down, micro-USB facing -X
     ctp_x1 = (tail_x0 + tail_x1) / 2 + p['ctp_w'] / 2
     ctp_x0 = ctp_x1 - p['ctp_w']
     ctp_y0 = lcd_bot + fpc_reach(p['tp_tail_len'])
@@ -285,28 +285,28 @@ def build():
     usb_y = ctp_y1 - p['ctp_usb']
     usb_z = z_pcb + p['usb_zc']
 
-    # teclado OSD na tampa, ponta do LED para baixo, botoes do lado de fora
+    # OSD keypad on the cover, LED end down, buttons on the outer side
     kp_y0 = cy - p['kp_l'] / 2
     kp_bx = p['kp_x'] + p['kp_w'] / 2 - p['kp_row']
     kp_btn = [(kp_bx, kp_y0 + s) for s in p['kp_btn']]
     kp_holes = [(kp_bx, kp_y0 + s) for s in p['kp_holes']]
-    # a distancia do teclado a tampa resulta do comprimento do pino
+    # the keypad-to-cover distance follows from the pin length
     kp_off = p['pin_len'] - p['back_t'] + p['kp_sw_h'] - p['key_float']
-    z_kp = z_in - kp_off                # face dos componentes do teclado
+    z_kp = z_in - kp_off                # component face of the keypad
     ky0, ky1 = kp_btn[0][1], kp_btn[-1][1]
     fdx = p['frame_screw_dx']
     frame_screws = [(kp_bx + sx * fdx, y) for sx in (-1, 1)
                     for y in (ky0 - 8.0, kp_y0 + 44.0, ky1 + 8.0)]
 
     def nut_slot(x, y, dx, dy, z0, reach):
-        # rasgo por onde a porca entra de lado, a partir de (x, y) no sentido (dx, dy)
+        # slot through which the nut slides in sideways, from (x, y) towards (dx, dy)
         a = p['nut_af'] / 2
         xa, xb = sorted((x - dx * 3.3 - abs(dy) * a, x + dx * reach + abs(dy) * a))
         ya, yb = sorted((y - dy * 3.3 - abs(dx) * a, y + dy * reach + abs(dx) * a))
         return box(xa, xb, ya, yb, z0, z0 + p['nut_h'])
 
-    # parafusos do chassis: (x, y, sentido para a parede do alojamento). A porca entra
-    # pela parede do alojamento e fica presa quando o LCD e montado.
+    # chassis screws: (x, y, direction towards the pocket wall). The nut slides in
+    # through the pocket wall and is trapped once the LCD is fitted.
     d_s = p['ledge'] / 2
     mid_screws = ([(px0 - d_s, y, 1, 0) for y in (py1 - 10.0, py0 + 12.0)] +
                   [(px1 + d_s, y, -1, 0) for y in (py1 - 10.0, py0 + 12.0)] +
@@ -316,29 +316,29 @@ def build():
 
     vesa = [(cx + sx * p['vesa'] / 2, cy + sy * p['vesa'] / 2) for sx in (-1, 1) for sy in (-1, 1)]
 
-    # ---------------- moldura frontal ----------------
+    # ---------------- front bezel ----------------
     front = ring(d_out, 0, z_split)
     for x, yw, sgn in lug_defs:
         add(front, lug_body(x, yw, sgn, 0, z_split))
     cut(front, box(wx0, wx1, wy0, wy1, -1, p['lip_t'] + 1))
     cut(front, box(px0, px1, py0, py1, p['lip_t'], z_split + 1))
     cut(front, ring(d_rec, z_ledge, z_split + 1))
-    # batentes que encostam a aresta inferior do LCD, fora das zonas dos flats
+    # stops for the LCD bottom edge, clear of the flex cable zones
     for bx0, bx1 in ((24.4, 44.4), (-43.6, -23.6)):
         add(front, box(bx0, bx1, py0 - 0.5, lcd_bot - p['fit'], p['lip_t'] - 0.5, z_glass + stack))
     groove = ring(d_gc + p['groove_w'] / 2, z_split - p['groove_d'], z_split + 1)
     cut(groove, ring(d_gc - p['groove_w'] / 2, z_split - p['groove_d'] - 1, z_split + 2))
     cut(front, groove)
-    # fecho: parafuso M3x20 pela tampa, porca num rasgo aberto na ponta de cada coluna
+    # closure: M3x20 screw through the cover, nut in a slot open at the tip of each column
     for x, yw, sgn in lug_defs:
         yc = yw + sgn * p['lug_out']
         cut(front, cyl_z(x, yc, p['lug_nut_z'] - 1.0, z_split + 1, p['m3_clear']))
         cut(front, nut_slot(x, yc, 0, sgn, p['lug_nut_z'], p['lug_d'] / 2 + 1.0))
-    # chassis: parafuso M3x10, porca num rasgo aberto para o alojamento do LCD
+    # chassis: M3x10 screw, nut in a slot open towards the LCD pocket
     for x, y, dx, dy in mid_screws:
         cut(front, cyl_z(x, y, z_mnut - 1.4, z_ledge + 1, p['m3_clear']))
         cut(front, nut_slot(x, y, dx, dy, z_mnut, d_s + 0.5))
-    # pala de sol: (x, y, sentido para a aresta exterior por onde entra a porca)
+    # sun hood: (x, y, direction towards the outer edge the nut slides in from)
     hood_side = [(cx + sx * p['hood_side_dx'], cy + sy * p['hood_side_dy'], sx, 0)
                  for sx in (-1, 1) for sy in (-1, 1)]
     hood_top = [(cx + sx * p['hood_top_dx'], cy + p['hood_top_dy'], 0, 1) for sx in (-1, 1)]
@@ -348,13 +348,13 @@ def build():
         edge = (ax1 + d_out - x) if dx > 0 else (x - (ax0 - d_out)) if dx < 0 else \
                (ay1 + d_out - y) if dy > 0 else (y - (ay0 - d_out))
         cut(front, nut_slot(x, y, dx, dy, p['hood_nut_z'], edge + 1.0))
-    g['Moldura frontal'] = front
+    g['Front bezel'] = front
 
     # ---------------- chassis ----------------
     mid = ring(d_mid, z_ledge, z_split)
     z_so = z_split + p['so_h']
-    # placas: parafuso M3x10 por cima, porca num alojamento sextavado por baixo do
-    # chassis, recuada 1,6 mm para a ponta do parafuso nao chegar ao LCD
+    # boards: M3x10 screw from above, nut in a hex pocket under the chassis,
+    # recessed 1.6 mm so the screw tip cannot reach the LCD
     for x, y in vb_holes + ctp_holes:
         add(mid, cyl_z(x, y, z_split - 0.5, z_split + 2.5, 9.5))
         add(mid, cyl_z(x, y, z_split - 0.5, z_so, 7.0))
@@ -367,7 +367,7 @@ def build():
         cut(mid, box(sx0, sx1, py0, lcd_bot + p['fpc_slot'], z_ledge - 1, z_split + 1))
     g['Chassis'] = mid
 
-    # ---------------- tampa traseira ----------------
+    # ---------------- rear cover ----------------
     back = ring(d_out, z_split, T)
     for x, yw, sgn in lug_defs:
         add(back, lug_body(x, yw, sgn, z_split, T))
@@ -396,19 +396,19 @@ def build():
     cut(back, box(hdmi_x - hw, hdmi_x + hw, ay1 + d_in - 1, oy1 + 1, hdmi_z - hh, hdmi_z + hh))
     cut(back, cyl((dc_x, ay1 + d_in - 1, dc_z), (dc_x, oy1 + 1, dc_z), p['dc_open']))
     cut(back, box(ox0 - 1, ax0 - d_in + 1, usb_y - uw, usb_y + uw, usb_z - uh, usb_z + uh))
-    g['Tampa traseira'] = back
+    g['Rear cover'] = back
 
-    # ---------------- tampoes em TPU ----------------
-    # cada tampao fica preso a caixa por uma haste fina com olhal e um parafuso M3,
-    # que rosca num furo cego reforcado por dentro da parede
+    # ---------------- TPU port caps ----------------
+    # each cap is tethered to the case by a thin strap with an eyelet and an M3
+    # screw, which threads into a blind hole reinforced on the inside of the wall
     m, ct, cp = 1.5, p['cap_t'], p['cap_plug']
     sl, sw, st, ed = p['tether_len'], p['tether_w'], p['tether_t'], p['eye_d']
     rib, hole = p['tether_rib'], p['tether_hole']
     dr = p['dc_open'] / 2
 
     z0c, z1c = min(hdmi_z - hh, dc_z - dr) - m, max(hdmi_z + hh, dc_z + dr) + m
-    # tampao de cima: haste em L que desce ate a aresta da moldura frontal e corre
-    # por baixo do tampao ate ao olhal, para nao ocupar o espaco das colunas
+    # top cap: L-shaped tether that drops to the edge of the front bezel and runs
+    # under the cap to the eyelet, so it stays clear of the screw columns
     x_a, x_end = hdmi_x - hw - m, dc_x + dr + m
     tw, te = p['tether_top_w'], p['eye_top_d']
     xe, ze = x_a + p['tether_top_len'], z_split / 2
@@ -420,7 +420,7 @@ def build():
     add(cap, box(x_a, xe, y_s0, y_s1, ze - tw / 2, ze + tw / 2))
     add(cap, cyl((xe, oy1, ze), (xe, oy1 + ct, ze), te))
     cut(cap, cyl((xe, oy1 - 1, ze), (xe, oy1 + ct + 1, ze), p['m3_clear']))
-    g['Tampao HDMI+DC (TPU)'] = cap
+    g['HDMI+DC port cap (TPU)'] = cap
     cut(front, cyl((xe, oy1 - hole, ze), (xe, oy1 + 1, ze), p['ins_d']))
 
     y_end = usb_y - uw - m
@@ -430,12 +430,12 @@ def build():
     add(cap, box(ox0 - ct, ox0 - ct + st, ye, y_end + 0.5, usb_z - sw / 2, usb_z + sw / 2))
     add(cap, cyl((ox0 - ct, ye, usb_z), (ox0, ye, usb_z), ed))
     cut(cap, cyl((ox0 - ct - 1, ye, usb_z), (ox0 + 1, ye, usb_z), p['m3_clear']))
-    g['Tampao USB (TPU)'] = cap
+    g['USB port cap (TPU)'] = cap
     add(back, box(ax0 - d_in - 0.5, ax0 - d_in + rib, ye - 4.0, ye + 4.0, usb_z - 4.0, z_in + 0.5))
     cut(back, cyl((ox0 - 1, ye, usb_z), (ox0 + hole, ye, usb_z), p['ins_d']))
 
-    # tira de teclas em TPU: aba fina com cordao de vedacao, corpo com uma camara
-    # por botao e uma marca em relevo no eixo de cada pino
+    # TPU keypad strip: thin flange with a sealing bead, body with one chamber per
+    # button and a raised marker on each pin axis
     cav_h = p['key_float'] + p['pin_head_h'] + 0.1
     z_roof = T + cav_h + p['key_roof']
     keys = box(kp_bx - 9.0, kp_bx + 9.0, ky0 - 9.0, ky1 + 9.0, T, T + p['key_flange'])
@@ -448,9 +448,9 @@ def build():
     for x, y in kp_btn:
         cut(keys, cyl_z(x, y, T - 1, T + cav_h, p['key_cav_d']))
         add(keys, cyl_z(x, y, z_roof - 0.2, z_roof + p['key_nub_h'], p['key_nub_d']))
-    g['Teclas (TPU)'] = keys
+    g['Keypad strip (TPU)'] = keys
 
-    # aro que aperta a tira de teclas contra a tampa
+    # frame that clamps the keypad strip against the cover
     fw = p['frame_half_w']
     z_fr = T + p['frame_t']
     frame = rrect(kp_bx - fw, kp_bx + fw, ky0 - 13.0, ky1 + 13.0, T, z_fr, 4.0)
@@ -459,22 +459,22 @@ def build():
     for x, y in frame_screws:
         cut(frame, cyl_z(x, y, T - 1, z_fr + 1, p['m3_clear']))
         cut(frame, cyl_z(x, y, T + 1.5, z_fr + 1, 6.2))
-    g['Aro das teclas'] = frame
+    g['Keypad frame'] = frame
 
-    # ---------------- pala de sol ----------------
+    # ---------------- sun hood ----------------
     hm, hd, hwl, hft = p['hood_margin'], p['hood_depth'], p['hood_wall'], p['hood_flange_t']
-    hx0, hx1, hy0, hy1 = wx0 - hm, wx1 + hm, wy0 - hm, wy1 + hm     # faces interiores
-    # a aba segue o contorno da moldura, recuada por igual a toda a volta, para os
-    # cantos ficarem concentricos com os da caixa
+    hx0, hx1, hy0, hy1 = wx0 - hm, wx1 + hm, wy0 - hm, wy1 + hm     # inner faces
+    # the flange follows the bezel outline, inset evenly all round, so its corners
+    # are concentric with those of the case
     ins, r_in = p['hood_inset'], p['hood_corner_r']
     hood = rrect(ax0 - d_out + ins, ax1 + d_out - ins, ay0 - d_out + ins, ay1 + d_out - ins,
                  -hft, 0, p['r_out'] - ins)
     cut(hood, rrect(hx0, hx1, hy0 - 40.0, hy1, -hft - 1, 1, r_in))
-    # teto e abas laterais numa so casca, com os cantos de cima arredondados
+    # roof and side wings as a single shell, with rounded top corners
     shell = rrect(hx0 - hwl, hx1 + hwl, hy0 - 40.0, hy1 + hwl, -hd, 0, r_in + hwl)
     cut(shell, rrect(hx0, hx1, hy0 - 50.0, hy1, -hd - 1, 1, r_in))
-    # abas em cunha: fundas em cima, curtas em baixo. O corte parte da face
-    # interior do teto, para nao lhe tocar.
+    # wedge-shaped wings: deep at the top, short at the bottom. The cut starts at
+    # the inner face of the roof so it does not touch it.
     z_top, z_bot = -hd, -p['hood_depth_bottom']
     ly, lz = hy0 - hy1, z_bot - z_top
     ll = math.hypot(ly, lz)
@@ -489,11 +489,11 @@ def build():
     cut(hood, box(ax0 - d_out - 1, ax1 + d_out + 1, hy0 - 60.0, hy0, -hd - 1, 1))
     for x, y, _dx, _dy in hood_side + hood_top:
         cut(hood, cyl_z(x, y, -hft - 1, 1, p['m3_clear']))
-    g['Pala de sol'] = hood
+    g['Sun hood'] = hood
 
-    # ---------------- referencia: componentes do kit ----------------
+    # ---------------- reference: kit components ----------------
     ref = {}
-    ref['LCD + vidro de toque'] = box(-p['lcd_w'] / 2, p['lcd_w'] / 2, lcd_bot, -lcd_bot, z_glass, z_glass + stack)
+    ref['LCD + touch glass'] = box(-p['lcd_w'] / 2, p['lcd_w'] / 2, lcd_bot, -lcd_bot, z_glass, z_glass + stack)
     vb = box(vb_x0, vb_x0 + p['vb_w'], vb_y0, vb_y1, z_so, z_pcb)
     add(vb, box(hdmi_x - 7.5, hdmi_x + 7.5, vb_y1 - 10.5, vb_y1 + 1.0, z_pcb, z_pcb + 6.2))
     add(vb, box(dc_x - 4.5, dc_x + 4.5, vb_y1 - 11.0, vb_y1 + 3.0, z_pcb, z_pcb + 11.0))
@@ -501,14 +501,14 @@ def build():
     add(vb, box(vx - 15.5, vx + 15.5, vb_y1 - 10.0, vb_y1 + 6.0, z_pcb, z_pcb + 12.5))
     rx = vb_x0 + p['vb_rca_x']
     add(vb, box(rx - 5.0, rx + 5.0, vb_y1 - 8.0, vb_y1 + 4.0, z_pcb, z_pcb + 13.0))
-    ref['Placa de video'] = vb
+    ref['Video board'] = vb
     ctp = box(ctp_x0, ctp_x1, ctp_y0, ctp_y1, z_so, z_pcb)
     add(ctp, box(ctp_x0 - 0.5, ctp_x0 + 5.0, usb_y - 4.0, usb_y + 4.0, z_pcb, z_pcb + 2.8))
-    ref['Placa do toque'] = ctp
+    ref['Touch board'] = ctp
     kp = box(p['kp_x'] - p['kp_w'] / 2, p['kp_x'] + p['kp_w'] / 2, kp_y0, kp_y0 + p['kp_l'], z_kp - p['pcb_t'], z_kp)
     for x, y in kp_btn:
         add(kp, box(x - 3, x + 3, y - 3, y + 3, z_kp, z_kp + p['kp_sw_h']))
-    ref['Teclado OSD'] = kp
+    ref['OSD keypad'] = kp
     z_sw = z_kp + p['kp_sw_h']
     pins = None
     for x, y in kp_btn:
@@ -518,34 +518,34 @@ def build():
             pins = pin
         else:
             add(pins, pin)
-    ref['Pinos das teclas (5x M3x16)'] = pins
+    ref['Key pins (5x M3x16)'] = pins
 
-    # prova de encaixe: so a aba, a janela e 4 mm de alojamento, com parede fina.
-    # Serve para confirmar o tamanho do LCD e a posicao da janela com pouco material.
+    # fit test: just the lip, the window and 4 mm of pocket, with a thin wall.
+    # Confirms the LCD size and the window position with little material.
     tw_, th_ = p['test_wall'], p['lip_t'] + p['test_depth']
     test = box(px0 - tw_, px1 + tw_, py0 - tw_, py1 + tw_, 0, th_)
     cut(test, box(wx0, wx1, wy0, wy1, -1, p['lip_t'] + 1))
     cut(test, box(px0, px1, py0, py1, p['lip_t'], th_ + 1))
     for bx0, bx1 in ((24.4, 44.4), (-43.6, -23.6)):
         add(test, box(bx0, bx1, py0 - 0.5, lcd_bot - p['fit'], p['lip_t'] - 0.5, th_))
-    # prova das ferragens: um bloco com a espessura da moldura e um exemplar de cada
-    # furo ou rasgo usado na caixa, para afinar as folgas no material final
+    # hardware test: a block as thick as the bezel with one of each hole or slot
+    # used in the case, to tune clearances in the final material
     cw, cd = 40.0, 24.0
     coupon = box(0, cw, 0, cd, 0, z_split)
-    cut(coupon, cyl_z(6.0, 6.0, p['lug_nut_z'] - 1.0, z_split + 1, p['m3_clear']))     # rasgo de porca
+    cut(coupon, cyl_z(6.0, 6.0, p['lug_nut_z'] - 1.0, z_split + 1, p['m3_clear']))     # nut slot
     cut(coupon, nut_slot(6.0, 6.0, 0, -1, p['lug_nut_z'], 7.0))
-    cut(coupon, cyl_z(16.0, 8.0, -1, z_split + 1, p['m3_clear']))                      # porca sextavada
+    cut(coupon, cyl_z(16.0, 8.0, -1, z_split + 1, p['m3_clear']))                      # hex nut pocket
     cut(coupon, hexprism(16.0, 8.0, -1, 4.0, p['nut_af']))
-    cut(coupon, cyl_z(25.0, 8.0, z_split - 7.0, z_split + 1, p['ins_d']))              # inserto M3
-    cut(coupon, cyl_z(34.0, 8.0, -1, p['vesa_ins_depth'], p['vesa_ins_d']))            # inserto M4
+    cut(coupon, cyl_z(25.0, 8.0, z_split - 7.0, z_split + 1, p['ins_d']))              # M3 insert
+    cut(coupon, cyl_z(34.0, 8.0, -1, p['vesa_ins_depth'], p['vesa_ins_d']))            # M4 insert
     cut(coupon, box(-1, cw + 1, 17.8, 17.8 + p['groove_w'], z_split - p['groove_d'], z_split + 1))
-    # prova das portas: so a parede de cima da tampa (com as tres colunas, para
-    # aparafusar no sitio) e o troco da parede lateral com o micro-USB, sem o fundo
+    # port wall test: only the top wall of the cover (with its three columns, so it
+    # bolts on in place) and the stretch of side wall with the micro-USB, no back
     region = box(ax0 - d_out - 20, ax1 + d_out + 20, ay1 + d_in, ay1 + d_out + 20, z_split - 3, z_in)
     add(region, box(ax0 - d_out - 20, ax0 - d_in, usb_y - 18.0, ay1 + d_out + 20, z_split - 3, z_in))
     ports = tbm.copy(back)
     tbm.booleanOperation(ports, region, adsk.fusion.BooleanTypes.IntersectionBooleanType)
-    extras = {'Prova do alojamento': test, 'Prova das ferragens': coupon, 'Prova das portas': ports}
+    extras = {'LCD pocket test': test, 'Hardware test': coupon, 'Port wall test': ports}
 
     info = dict(T=T, z_split=z_split, z_in=z_in, z_pcb=z_pcb, cy=cy,
                 width=(ax1 - ax0) + 2 * d_out, height=(ay1 - ay0) + 2 * d_lug + p['lug_d'],
@@ -574,7 +574,7 @@ def chamfer_loop(comp, z_mm, dist_mm, outer):
     for loop in face.loops:
         if loop.isOuter != outer:
             continue
-        # nos contornos interiores so interessa a janela, nao os furos
+        # of the inner loops only the window matters, not the holes
         if not outer and loop.edges.count != 4:
             continue
         edges = adsk.core.ObjectCollection.create()
@@ -618,15 +618,15 @@ def snapshot(app, name, eye, up=(0, 1, 0), target=(0, 0, 2)):
     vp.saveAsImageFile(os.path.join(OUT, name), 1600, 1100)
 
 
-# rotacao (eixo, graus) que poe cada peca na posicao de impressao: a face que
-# assenta na cama fica em Z = 0, sem precisar de suportes
+# rotation (axis, degrees) that puts each part in its print orientation: the face
+# that sits on the bed ends up at Z = 0, with no supports needed
 PRINT_ROT = {
-    'Tampa traseira': ((1, 0, 0), 180),          # costas na cama, abertura para cima
-    'Pala de sol': ((1, 0, 0), 180),             # aba na cama
-    'Aro das teclas': ((1, 0, 0), 180),          # face exterior na cama
-    'Tampao HDMI+DC (TPU)': ((1, 0, 0), -90),    # face exterior na cama, encaixes para cima
-    'Tampao USB (TPU)': ((0, 1, 0), -90),
-    'Prova das portas': ((1, 0, 0), 180),
+    'Rear cover': ((1, 0, 0), 180),          # back on the bed, opening up
+    'Sun hood': ((1, 0, 0), 180),             # flange on the bed
+    'Keypad frame': ((1, 0, 0), 180),          # outer face on the bed
+    'HDMI+DC port cap (TPU)': ((1, 0, 0), -90),    # outer face on the bed, plugs up
+    'USB port cap (TPU)': ((0, 1, 0), -90),
+    'Port wall test': ((1, 0, 0), 180),
 }
 
 
@@ -646,8 +646,8 @@ def print_oriented(name, body):
 
 
 def export_stls(app, jobs):
-    # exporta [(nome, corpo, ficheiro)] na posicao de impressao, a partir de um
-    # documento temporario, sem tocar no documento principal
+    # exports [(name, body, file)] in print orientation from a temporary document,
+    # without touching the main document
     tdoc = app.documents.add(adsk.core.DocumentTypes.FusionDesignDocumentType)
     tdes = adsk.fusion.Design.cast(app.activeProduct)
     tdes.designType = adsk.fusion.DesignTypes.DirectDesignType
@@ -674,24 +674,24 @@ def run(context):
     try:
         tbm = adsk.fusion.TemporaryBRepManager.get()
         parts, ref, info, extras = build()
-        log('dimensoes exteriores (mm): %.1f x %.1f x %.1f' % (info['width'], info['height'], info['T']))
+        log('outer dimensions (mm): %.1f x %.1f x %.1f' % (info['width'], info['height'], info['T']))
         log('info: %r' % (info,))
 
-        # se o documento ativo ja for o da caixa, reconstruir nele; senao criar um novo
+        # if the active document is already the enclosure, rebuild in it; otherwise create a new one
         design = adsk.fusion.Design.cast(app.activeProduct)
         if design and app.activeDocument.name.startswith('Rugged Monitor'):
             old = design.rootComponent.occurrences
             for occ in [old.item(i) for i in range(old.count)]:
                 occ.deleteMe()
-            log('reconstruido no documento %s' % app.activeDocument.name)
+            log('rebuilt in document %s' % app.activeDocument.name)
         else:
             app.documents.add(adsk.core.DocumentTypes.FusionDesignDocumentType)
             design = adsk.fusion.Design.cast(app.activeProduct)
-        # um design "Part" so aceita um componente
+        # a "Part" design accepts only one component
         try:
             design.designIntent = adsk.fusion.DesignIntentTypes.HybridDesignIntentType
         except Exception:
-            log('designIntent nao alterado:\n' + traceback.format_exc())
+            log('designIntent not changed:\n' + traceback.format_exc())
         design.fusionUnitsManager.distanceDisplayUnits = adsk.fusion.DistanceUnits.MillimeterDistanceUnits
         parametric = design.designType == adsk.fusion.DesignTypes.ParametricDesignType
         root = design.rootComponent
@@ -707,7 +707,7 @@ def run(context):
                 (bb.maxPoint.z - bb.minPoint.z) * 10))
 
         ref_occ = root.occurrences.addNewComponent(adsk.core.Matrix3D.create())
-        ref_occ.component.name = 'Kit EP-0084 (referencia)'
+        ref_occ.component.name = 'EP-0084 kit (reference)'
         for name, body in ref.items():
             rc = ref_occ.component
             if parametric:
@@ -720,41 +720,41 @@ def run(context):
             rc.bRepBodies.item(rc.bRepBodies.count - 1).name = name
 
         if parametric:
-            for name, z, dist, outer in (('Moldura frontal', 0.0, P['chamfer'], True),
-                                         ('Moldura frontal', 0.0, P['win_chamfer'], False),
-                                         ('Tampa traseira', info['T'], P['chamfer'], True)):
+            for name, z, dist, outer in (('Front bezel', 0.0, P['chamfer'], True),
+                                         ('Front bezel', 0.0, P['win_chamfer'], False),
+                                         ('Rear cover', info['T'], P['chamfer'], True)):
                 try:
                     chamfer_loop(occs[name].component, z, dist, outer)
                 except Exception:
-                    log('chanfro falhou em %s:\n%s' % (name, traceback.format_exc()))
+                    log('chamfer failed on %s:\n%s' % (name, traceback.format_exc()))
 
-        # interferencias entre pecas impressas e componentes do kit
+        # interferences between printed parts and kit components
         try:
             bodies = adsk.core.ObjectCollection.create()
-            for name in ('Moldura frontal', 'Chassis', 'Tampa traseira', 'Aro das teclas', 'Teclas (TPU)',
-                         'Pala de sol'):
+            for name in ('Front bezel', 'Chassis', 'Rear cover', 'Keypad frame', 'Keypad strip (TPU)',
+                         'Sun hood'):
                 bodies.add(occs[name].bRepBodies.item(0))
             for i in range(ref_occ.bRepBodies.count):
                 bodies.add(ref_occ.bRepBodies.item(i))
             res = design.analyzeInterference(design.createInterferenceInput(bodies))
-            log('interferencias: %d' % res.count)
+            log('interferences: %d' % res.count)
             for r in res:
                 log('  %s x %s: %.3f cm3' % (r.entityOne.name, r.entityTwo.name, r.interferenceBody.volume))
         except Exception:
-            log('analise de interferencias falhou:\n' + traceback.format_exc())
+            log('interference analysis failed:\n' + traceback.format_exc())
 
         em = design.exportManager
         em.execute(em.createSTEPExportOptions(os.path.join(OUT, 'rugged-monitor.step'), root))
-        files = {'Moldura frontal': 'moldura-frontal', 'Chassis': 'chassis', 'Tampa traseira': 'tampa-traseira',
-                 'Tampao HDMI+DC (TPU)': 'tampao-hdmi-dc-tpu', 'Tampao USB (TPU)': 'tampao-usb-tpu',
-                 'Teclas (TPU)': 'teclas-tpu', 'Aro das teclas': 'aro-teclas',
-                 'Pala de sol': 'pala-de-sol'}
-        # copias dos corpos do documento (ja com os chanfros) para exportar no fim
+        files = {'Front bezel': 'front-bezel', 'Chassis': 'chassis', 'Rear cover': 'rear-cover',
+                 'HDMI+DC port cap (TPU)': 'port-cap-hdmi-dc-tpu', 'USB port cap (TPU)': 'port-cap-usb-tpu',
+                 'Keypad strip (TPU)': 'keypad-strip-tpu', 'Keypad frame': 'keypad-frame',
+                 'Sun hood': 'sun-hood'}
+        # copies of the document bodies (chamfers included) to export at the end
         jobs = [(name, tbm.copy(occs[name].component.bRepBodies.item(0)), fn + '.stl')
                 for name, fn in files.items()]
-        jobs += [('Prova do alojamento', extras['Prova do alojamento'], 'prova-alojamento.stl'),
-                 ('Prova das ferragens', extras['Prova das ferragens'], 'prova-ferragens.stl'),
-                 ('Prova das portas', extras['Prova das portas'], 'prova-portas.stl')]
+        jobs += [('LCD pocket test', extras['LCD pocket test'], 'test-lcd-pocket.stl'),
+                 ('Hardware test', extras['Hardware test'], 'test-hardware.stl'),
+                 ('Port wall test', extras['Port wall test'], 'test-port-walls.stl')]
 
         def show(**vis):
             for name, occ in occs.items():
@@ -762,36 +762,36 @@ def run(context):
             ref_occ.isLightBulbOn = vis.get('ref', True)
 
         cz = info['T'] / 20.0
-        show(**{'Pala de sol': False})
-        snapshot(app, '1-frente.png', (-18, 12, -30), target=(0, 0, cz))
+        show(**{'Sun hood': False})
+        snapshot(app, '1-front.png', (-18, 12, -30), target=(0, 0, cz))
         show()
-        snapshot(app, '11-pala-de-sol.png', (-22, 16, -30), target=(0, 0, cz))
-        snapshot(app, '2-tras.png', (18, 14, 30), target=(0, 0, cz))
-        show(**{'Tampa traseira': False, 'Tampao HDMI+DC (TPU)': False, 'Tampao USB (TPU)': False, 'Teclas (TPU)': False,
-                'Aro das teclas': False})
+        snapshot(app, '11-sun-hood.png', (-22, 16, -30), target=(0, 0, cz))
+        snapshot(app, '2-rear.png', (18, 14, 30), target=(0, 0, cz))
+        show(**{'Rear cover': False, 'HDMI+DC port cap (TPU)': False, 'USB port cap (TPU)': False, 'Keypad strip (TPU)': False,
+                'Keypad frame': False})
         snapshot(app, '3-interior.png', (10, 14, 30), target=(0, 0, cz))
-        snapshot(app, '4-interior-topo.png', (0, 0.01, 40), target=(0, 0, cz))
-        show(default=False, **{'Tampa traseira': True}, ref=False)
-        snapshot(app, '5-tampa-dentro.png', (-12, 14, -30), target=(0, 0, cz))
-        show(default=False, **{'Moldura frontal': True}, ref=False)
-        snapshot(app, '6-moldura-dentro.png', (10, 14, 30), target=(0, 0, cz))
-        show(default=False, **{'Moldura frontal': True, 'Tampa traseira': True, 'Tampao HDMI+DC (TPU)': True,
-                               'Tampao USB (TPU)': True}, ref=False)
-        snapshot(app, '9-tampoes.png', (-22, 26, 16), up=(0, 0, 1), target=(0, 0, cz))
+        snapshot(app, '4-interior-top.png', (0, 0.01, 40), target=(0, 0, cz))
+        show(default=False, **{'Rear cover': True}, ref=False)
+        snapshot(app, '5-rear-cover-inside.png', (-12, 14, -30), target=(0, 0, cz))
+        show(default=False, **{'Front bezel': True}, ref=False)
+        snapshot(app, '6-front-bezel-inside.png', (10, 14, 30), target=(0, 0, cz))
+        show(default=False, **{'Front bezel': True, 'Rear cover': True, 'HDMI+DC port cap (TPU)': True,
+                               'USB port cap (TPU)': True}, ref=False)
+        snapshot(app, '9-port-caps.png', (-22, 26, 16), up=(0, 0, 1), target=(0, 0, cz))
         show(default=False, **{'Chassis': True}, ref=False)
-        snapshot(app, '10-chassis-por-baixo.png', (14, -16, -30), target=(0, 0, cz))
-        show(default=False, **{'Teclas (TPU)': True, 'Aro das teclas': True}, ref=False)
-        snapshot(app, '7-teclas-aro.png', (20, -14, 30), target=(7, 0, cz))
-        show(default=False, **{'Teclas (TPU)': True}, ref=False)
-        snapshot(app, '8-teclas-por-baixo.png', (20, -14, -30), target=(7, 0, cz))
+        snapshot(app, '10-chassis-underside.png', (14, -16, -30), target=(0, 0, cz))
+        show(default=False, **{'Keypad strip (TPU)': True, 'Keypad frame': True}, ref=False)
+        snapshot(app, '7-keypad-frame.png', (20, -14, 30), target=(7, 0, cz))
+        show(default=False, **{'Keypad strip (TPU)': True}, ref=False)
+        snapshot(app, '8-keypad-strip-underside.png', (20, -14, -30), target=(7, 0, cz))
         show()
-        snapshot(app, '2-tras.png', (18, 14, 30), target=(0, 0, cz))
-        log('STL na posicao de impressao:')
+        snapshot(app, '2-rear.png', (18, 14, 30), target=(0, 0, cz))
+        log('STL files in print orientation:')
         for line in export_stls(app, jobs):
             log('  ' + line)
         log('OK')
     except Exception:
-        log('ERRO:\n' + traceback.format_exc())
+        log('ERROR:\n' + traceback.format_exc())
     finally:
         with open(os.path.join(OUT, 'build.log'), 'w') as f:
             f.write('\n'.join(log_lines) + '\n')
