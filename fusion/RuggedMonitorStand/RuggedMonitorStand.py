@@ -35,15 +35,15 @@ P = dict(
     plate_h=90.0, plate_t=6.0, plate_r=6.0,
     screw_hole_d=4.5,
     screw_head_d=8.2, screw_head_depth=2.6,   # M4x8 button head (ISO 7380): 7.6 x 2.2
-    plate_in_w=90.0,        # distance between the inner faces of the walls
-    wall_t=6.0,             # side walls, which carry the pivot and the lock bolt
+    plate_in_w=88.0,        # distance between the inner faces of the walls
+    wall_t=7.0,             # side walls, which carry the pivot and the lock bolt
     # --- pivot and tilt ---
     pivot_e=18.0,           # pivot axis behind the back face of the cover
     pivot_u=-37.5,          # pivot position from the VESA centre (the lower VESA row)
     pivot_h=48.0,           # pivot axis above the table
     tilt_max=60.0,          # largest tilt back from vertical
     lock_r=30.0,            # radius of the lock bolt about the pivot
-    wall_boss_r=10.5, wall_lock_r=7.5,
+    wall_boss_r=10.5, wall_lock_r=9.0,   # the wall is the hull of these two circles
     # --- M4 hardware: hex head bolts, head held in a pocket of the wall ---
     bolt_hole_d=4.5, hex_af=7.3, hex_depth=3.0,
     bolt_len=20.0, bolt_d=4.0, head_af=7.0, head_h=2.8,
@@ -152,6 +152,27 @@ def rrect_xz(x0, x1, z0, z1, y0, y1, r):
     return b
 
 
+def convex_hull(points):
+    # Andrew's monotone chain; returns the vertices in counter-clockwise order
+    pts = sorted(set(points))
+    def cross(o, a, b):
+        return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
+    lo, up = [], []
+    for q in pts:
+        while len(lo) >= 2 and cross(lo[-2], lo[-1], q) <= 0:
+            lo.pop()
+        lo.append(q)
+    for q in reversed(pts):
+        while len(up) >= 2 and cross(up[-2], up[-1], q) <= 0:
+            up.pop()
+        up.append(q)
+    return lo[:-1] + up[:-1]
+
+
+def circle_points(a, b, r, n=36):
+    return [(a + r * math.cos(2 * math.pi * i / n), b + r * math.sin(2 * math.pi * i / n)) for i in range(n)]
+
+
 def build(info):
     p = P
     cx, cy, T = info['cx'], info['cy'], info['T']
@@ -191,8 +212,11 @@ def build(info):
     for s in (-1, 1):
         x0, x1 = sorted((cx + s * xw_in, cx + s * xw_out))
         # wall: starts inside the plate and runs back to the pivot and the lock bolt
-        tab = poly_prism([at(-p['pivot_e'] + 1.0, pl_b + 0.5), (t_a, t_b), at(0.0, p['wall_boss_r']),
-                          at(-p['pivot_e'] + 1.0, p['wall_boss_r'])], x0, x1)
+        # hull of the plate edge and the two bosses, so the web between them is as wide
+        # as the bosses taper (never narrower than the lock boss)
+        hull = convex_hull([(-p['pivot_e'] + 1.0, pl_b + 0.5), (-p['pivot_e'] + 1.0, p['wall_boss_r'])] +
+                           circle_points(0.0, 0.0, p['wall_boss_r']) + circle_points(la, lb, p['wall_lock_r']))
+        tab = poly_prism([at(a_, b_) for a_, b_ in hull], x0, x1)
         add(tab, cyl((x0, y_p, z_p), (x1, y_p, z_p), 2 * p['wall_boss_r']))
         add(tab, cyl((x0, t_b, t_a), (x1, t_b, t_a), 2 * p['wall_lock_r']))
         add(bracket, tab)
@@ -335,7 +359,7 @@ def sweep(app, mon, bracket, hw, base, plate, y_p, z_p):
         ov = 0.0
         rb = rot_x(bracket, deg, y_p, z_p)
         rh = rot_x(hw, deg, y_p, z_p)
-        d_br = mm.measureMinimumDistance(rb, base).value * 10.0
+        d_br = mm.measureMinimumDistance(rb, plate).value * 10.0
         ov += overlap(rb, base)
         # the hardware must clear the base (washers only touch the arm) and sit in the bracket holes
         ov_hw = overlap(rh, base) + overlap(rh, rb)
@@ -396,11 +420,11 @@ def run(context):
 
         rows = sweep(app, mon, parts['Tilt bracket'], hw, parts['Stand base'], sinfo['plate'], y_p, z_p)
         log('tilt sweep (distances in mm, overlaps in cm3):')
-        log('  tilt  enclosure-base  (closest part)        enclosure-table  bracket-base  hardware-enclosure  overlaps')
+        log('  tilt  enclosure-base  (closest part)        enclosure-table  bracket-table  hardware-enclosure  overlaps')
         for deg, d_mon, d_tab, d_br, d_hw, ov, ov_hw in rows:
             flag = '  <-- OVERLAP' if ov > 1e-4 or ov_hw > 1e-4 else (
                 '  <-- close' if d_mon[0] < P['min_clear'] else '')
-            log('  %4.0f  %14.1f  %-24s %9.1f  %12.1f  %18.1f  %.4f / %.4f%s' % (
+            log('  %4.0f  %14.1f  %-24s %9.1f  %13.1f  %18.1f  %.4f / %.4f%s' % (
                 deg, d_mon[0], d_mon[1], d_tab, d_br, d_hw, ov, ov_hw, flag))
 
         # --- document ---

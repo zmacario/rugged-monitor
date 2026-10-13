@@ -93,8 +93,8 @@ cover, so the enclosure itself is not modified, and the screen tilts from uprigh
 | File | Material | Volume |
 |---|---|---|
 | `stand-base.stl` | Rigid | 153 cm³ |
-| `stand-bracket.stl` | Rigid | 62 cm³ |
-| `test-stand-hinge.stl` | Rigid | 28 cm³ |
+| `stand-bracket.stl` | Rigid | 67 cm³ |
+| `test-stand-hinge.stl` | Rigid | 31 cm³ |
 
 `test-stand-hinge.stl` is a fit test: one arm with its slot and one wall with the
 hex pockets and the counterbored VESA hole. Print it before the two large parts.
