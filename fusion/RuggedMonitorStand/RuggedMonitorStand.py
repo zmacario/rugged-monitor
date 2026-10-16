@@ -43,7 +43,8 @@ P = dict(
     pivot_h=48.0,           # pivot axis above the table
     tilt_max=60.0,          # largest tilt back from vertical
     lock_r=30.0,            # radius of the lock bolt about the pivot
-    wall_boss_r=10.5, wall_lock_r=9.0,   # the wall is the hull of these two circles
+    wall_boss_r=10.5, wall_lock_r=9.0,   # the wall is the hull of these two circles ...
+    wall_root_h=45.0,       # ... and of its root, which runs this far up the plate edge (above the pivot)
     # --- M4 hardware: hex head bolts, head held in a pocket of the wall ---
     bolt_hole_d=4.5, hex_af=7.3, hex_depth=3.0,
     bolt_len=20.0, bolt_d=4.0, head_af=7.0, head_h=2.8,
@@ -212,9 +213,11 @@ def build(info):
     for s in (-1, 1):
         x0, x1 = sorted((cx + s * xw_in, cx + s * xw_out))
         # wall: starts inside the plate and runs back to the pivot and the lock bolt
-        # hull of the plate edge and the two bosses, so the web between them is as wide
-        # as the bosses taper (never narrower than the lock boss)
-        hull = convex_hull([(-p['pivot_e'] + 1.0, pl_b + 0.5), (-p['pivot_e'] + 1.0, p['wall_boss_r'])] +
+        # hull of the plate edge and the two bosses: the web between them is never
+        # narrower than the lock boss, and the long root on the plate edge with its
+        # sloping top edge makes the junction with the plate a gusset instead of a
+        # 90 degree step
+        hull = convex_hull([(-p['pivot_e'] + 1.0, pl_b + 0.5), (-p['pivot_e'] + 1.0, p['wall_root_h'])] +
                            circle_points(0.0, 0.0, p['wall_boss_r']) + circle_points(la, lb, p['wall_lock_r']))
         tab = poly_prism([at(a_, b_) for a_, b_ in hull], x0, x1)
         add(tab, cyl((x0, y_p, z_p), (x1, y_p, z_p), 2 * p['wall_boss_r']))
