@@ -25,7 +25,7 @@ The files in `out/` open in print orientation and need no supports.
 | `chassis.stl` | Rigid | 46 cm³ |
 | `rear-cover.stl` | Rigid | 184 cm³ |
 | `keypad-frame.stl` | Rigid | 7 cm³ |
-| `sun-hood.stl` | Rigid | 42 cm³ |
+| `sun-hood.stl` | Rigid | 32 cm³ |
 | `keypad-strip-tpu.stl` | TPU 95A | 2 cm³ |
 | `port-cap-hdmi-dc-tpu.stl` | TPU 95A | 4 cm³ |
 | `port-cap-usb-tpu.stl` | TPU 95A | 1 cm³ |

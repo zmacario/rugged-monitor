@@ -117,7 +117,10 @@ P = dict(
     hood_nut_z=3.0, hood_hole_z=7.8,
     hood_inset=1.9,         # flange inset from the bezel outline
     hood_corner_r=6.0,      # inner radius of the hood top corners
-    hood_margin=6.0, hood_depth=50.0, hood_depth_bottom=15.0, hood_wall=2.0, hood_flange_t=3.0,
+    hood_margin=6.0, hood_depth=30.0, hood_depth_bottom=15.0, hood_wall=2.0, hood_flange_t=3.0,
+    # two triangular braces on top of the roof, tying it to the flange between the
+    # two top screws
+    hood_gusset_x=28.0, hood_gusset_t=3.0, hood_gusset_len=20.0,
 )
 
 OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))), 'out')
@@ -487,6 +490,25 @@ def build():
     cut(shell, tbm.createBox(obb))
     add(hood, shell)
     cut(hood, box(ax0 - d_out - 1, ax1 + d_out + 1, hy0 - 60.0, hy0, -hd - 1, 1))
+    # braces: a vertical triangle on top of the roof, one leg along the front face of
+    # the flange and the other along the roof, so the roof cannot bend down
+    g_y0 = hy1 + hwl                                  # top face of the roof
+    g_y1 = ay1 + d_out - ins - 1.5                    # just below the top of the flange
+    g_z1 = -hft                                       # front face of the flange
+    g_z0 = g_z1 - p['hood_gusset_len']
+    gl = math.hypot(g_y1 - g_y0, g_z1 - g_z0)
+    guy, guz = (g_y0 - g_y1) / gl, (g_z0 - g_z1) / gl     # along the sloping edge
+    gny, gnz = -guz, guy                                   # towards the corner to cut
+    for sx in (-1, 1):
+        gx = cx + sx * p['hood_gusset_x']
+        gt = p['hood_gusset_t'] / 2
+        gus = box(gx - gt, gx + gt, g_y0 - 0.5, g_y1, g_z0, g_z1 + 0.5)
+        obb = adsk.core.OrientedBoundingBox3D.create(
+            pt(gx, (g_y0 + g_y1) / 2 + gny * 50.0, (g_z0 + g_z1) / 2 + gnz * 50.0),
+            adsk.core.Vector3D.create(0, guy, guz), adsk.core.Vector3D.create(0, gny, gnz),
+            40.0, 10.0, 2.0)
+        cut(gus, tbm.createBox(obb))
+        add(hood, gus)
     for x, y, _dx, _dy in hood_side + hood_top:
         cut(hood, cyl_z(x, y, -hft - 1, 1, p['m3_clear']))
     g['Sun hood'] = hood
