@@ -139,12 +139,23 @@ closest approach to the base in `out/build-stand.log`.
 
 ## Status
 
-The bezel, chassis and cover have been printed and validated against the real
-hardware. The keys (TPU strip, pins and frame), the port caps and the silicone gasket
-have not been tested yet.
+Version 1 is complete. Every part of the enclosure has been printed and validated
+against the real hardware: bezel, chassis, cover, keys (TPU strip, pins and frame), port
+caps. A thin bead of silicone sealant in the bezel groove sealed the
+gasket well.
 
 The desk stand has been checked in the model only (no overlaps from 0° to 60°, hardware
 included). It has not been printed yet.
+
+### Planned for the next version
+
+1. Slightly thicker port caps.
+2. Tether screw holes for the port caps in the rear cover only, never in the front
+   bezel. Today the top cap's tether screws into the bezel, so the cap ties the two
+   halves together and has to come off before the case can be opened.
+3. A shallower rear cover: there is plenty of free space inside. Its depth comes from an
+   assumed 13 mm for the tallest component on the video board (`comp_h`), which was never
+   measured; measure it first.
 
 ## License
 
