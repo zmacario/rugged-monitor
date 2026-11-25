@@ -140,8 +140,8 @@ closest approach to the base in `out/build-stand.log`.
 ## Status
 
 Version 1 is complete. Every part of the enclosure has been printed and validated
-against the real hardware: bezel, chassis, cover, keys (TPU strip, pins and frame) and
-port caps. A thin bead of silicone sealant in the bezel groove sealed the gasket well.
+against the real hardware: bezel, chassis, cover, keys (TPU strip, pins and frame),
+port caps and sun hood. A thin bead of silicone sealant in the bezel groove sealed the gasket well.
 
 The desk stand has been checked in the model only (no overlaps from 0° to 60°, hardware
 included). It has not been printed yet.
